@@ -1,0 +1,5 @@
+com\matchinvest\soap\certification\GetCertificationStatusResponse.class
+com\matchinvest\soap\MatchInvestSoapApplication.class
+com\matchinvest\soap\certification\GetCertificationStatusRequest.class
+com\matchinvest\soap\config\SoapWebServiceConfig.class
+com\matchinvest\soap\endpoint\CertificationEndpoint.class
