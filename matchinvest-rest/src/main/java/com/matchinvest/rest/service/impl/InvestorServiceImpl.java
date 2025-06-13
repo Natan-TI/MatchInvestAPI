@@ -9,23 +9,40 @@ import com.matchinvest.rest.dto.InvestorRequestDTO;
 import com.matchinvest.rest.dto.InvestorResponseDTO;
 import com.matchinvest.rest.exception.ResourceNotFoundException;
 import com.matchinvest.rest.mapper.InvestorMapper;
+import com.matchinvest.rest.model.AppUser;
 import com.matchinvest.rest.model.Investor;
+import com.matchinvest.rest.repository.AppUserRepository;
 import com.matchinvest.rest.repository.InvestorRepository;
 import com.matchinvest.rest.service.InvestorService;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class InvestorServiceImpl implements InvestorService {
   private final InvestorRepository repo;
+  private final AppUserRepository userRepo;
   private final InvestorMapper mapper;
 
-  public InvestorServiceImpl(InvestorRepository repo, InvestorMapper mapper) {
+  public InvestorServiceImpl(InvestorRepository repo, AppUserRepository userRepo, InvestorMapper mapper) {
     this.repo = repo;
+    this.userRepo = userRepo;
     this.mapper = mapper;
   }
 
   @Override
-  public InvestorResponseDTO create(InvestorRequestDTO dto) {
-    return mapper.toDTO(repo.save(mapper.toEntity(dto)));
+  public InvestorResponseDTO create(InvestorRequestDTO dto, Long userId) {
+    AppUser user = userRepo.findById(userId)
+        .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+    // monta a entidade a partir do DTO
+    Investor inv = mapper.toEntity(dto);
+
+    // associa o usuário e puxa o nome completo dele
+    inv.setUser(user);
+    inv.setName(user.getFullName());
+
+    Investor saved = repo.save(inv);
+    return mapper.toDTO(saved);
   }
 
   @Override
@@ -46,8 +63,7 @@ public class InvestorServiceImpl implements InvestorService {
   public InvestorResponseDTO update(Long id, InvestorRequestDTO dto) {
     Investor existing = repo.findById(id)
       .orElseThrow(() -> new ResourceNotFoundException("Investor não encontrado: " + id));
-    mapper.toEntity(dto); 
-    existing.setName(dto.getName());
+    mapper.toEntity(dto);
     existing.setCapitalAvailable(dto.getCapitalAvailable());
     existing.setRiskAppetite(dto.getRiskAppetite());
     return mapper.toDTO(repo.save(existing));
