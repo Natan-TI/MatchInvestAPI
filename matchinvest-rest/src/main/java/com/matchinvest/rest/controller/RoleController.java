@@ -3,6 +3,8 @@ package com.matchinvest.rest.controller;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,6 +22,7 @@ import com.matchinvest.rest.repository.AppUserRepository;
 public class RoleController {
 
   private final AppUserRepository userRepo;
+  private static final Logger log = LoggerFactory.getLogger(RoleController.class);
   public RoleController(AppUserRepository userRepo) {
     this.userRepo = userRepo;
   }
@@ -27,6 +30,7 @@ public class RoleController {
   @PostMapping("/choose-role")
   public ResponseEntity<Void> chooseRole(Authentication auth,
                                          @RequestBody Map<String,String> body) {
+    log.info("POST /api/v1/auth/choose-role — payload={}", body);
     String role = body.get("role");
     if (!Set.of("INVESTOR","ADVISOR").contains(role)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role inválida");

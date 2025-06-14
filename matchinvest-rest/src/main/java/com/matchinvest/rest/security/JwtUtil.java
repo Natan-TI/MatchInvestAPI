@@ -1,5 +1,6 @@
 package com.matchinvest.rest.security;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -25,13 +26,16 @@ public class JwtUtil {
          .map(GrantedAuthority::getAuthority).toList())
       .setIssuedAt(new Date())
       .setExpiration(new Date(System.currentTimeMillis()+expMillis))
-      .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
+      .signWith(
+    		  Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)),
+    		  SignatureAlgorithm.HS256
+    		)
       .compact();
   }
 
   public Claims parseToken(String token) {
     return Jwts.parserBuilder()
-      .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
+      .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
       .build()
       .parseClaimsJws(token)
       .getBody();

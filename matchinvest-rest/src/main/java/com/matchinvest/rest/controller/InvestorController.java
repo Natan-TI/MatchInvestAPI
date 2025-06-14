@@ -3,6 +3,8 @@ package com.matchinvest.rest.controller;
 import java.net.URI;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,10 +29,12 @@ import jakarta.validation.Valid;
 public class InvestorController {
   private final InvestorService service;
   private final AppUserRepository userRepository;
+  private static final Logger log = LoggerFactory.getLogger(InvestorController.class);
   public InvestorController(InvestorService service, AppUserRepository userRepository) { this.service = service; this.userRepository = userRepository;}
 
   @PostMapping
   public ResponseEntity<InvestorResponseDTO> create(@Valid @RequestBody InvestorRequestDTO dto, Authentication authentication) {
+	  log.info("POST /api/v1/investors — payload={}", dto);
 	  String username = authentication.getName();
 	    AppUser user = userRepository.findByUsername(username)
 	                    .orElseThrow(/* … */);
@@ -43,11 +47,13 @@ public class InvestorController {
 
   @GetMapping
   public ResponseEntity<List<InvestorResponseDTO>> listAll() {
+    log.info("GET /api/v1/investors");
     return ResponseEntity.ok(service.findAll());
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<InvestorResponseDTO> getById(@PathVariable Long id) {
+	log.info("GET /api/v1/investors/{}", id);
     return ResponseEntity.ok(service.findById(id));
   }
 
@@ -55,11 +61,13 @@ public class InvestorController {
   public ResponseEntity<InvestorResponseDTO> update(
       @PathVariable Long id,
       @Valid @RequestBody InvestorRequestDTO dto) {
+	  log.info("PUT /api/v1/investors/{} — payload={}", id, dto);
     return ResponseEntity.ok(service.update(id, dto));
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable Long id) {
+	log.info("DELETE /api/v1/investors/{}", id);
     service.delete(id);
     return ResponseEntity.noContent().build();
   }

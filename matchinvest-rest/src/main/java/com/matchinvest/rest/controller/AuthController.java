@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +32,7 @@ public class AuthController {
     private final AppUserRepository repo;
     private final PasswordEncoder encoder;
     private final JwtUtil jwtUtil;
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     public AuthController(AppUserRepository repo, PasswordEncoder encoder, JwtUtil jwtUtil) {
         this.repo = repo;
@@ -39,6 +42,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO dto) {
+    	log.info("POST /api/v1/auth/register — payload={}", dto);
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", "Senha e confirmação não conferem"));
@@ -65,6 +69,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody UserLoginDTO dto) {
+    	log.info("POST /api/v1/auth/login — payload={}", dto);
         Optional<AppUser> optUser = repo.findByUsername(dto.getUsername());
         if (optUser.isEmpty() || !encoder.matches(dto.getPassword(), optUser.get().getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
