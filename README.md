@@ -41,13 +41,13 @@
 
 ## **Configuração**
 1. **Clone o repositório**:
-```js
+```bash
 git clone https://github.com/Natan-TI/MatchInvestAPI
 cd matchinvest-rest
 ```
 
 2. **Aplicação de Propriedades**: Edite `src/main/resources/application.properties` com:
-```sh
+```yaml
 #H2 com criptografia em repouso
 spring.datasource.url=jdbc:h2:file:./data/matchinvest;CIPHER=AES
 spring.datasource.driverClassName=org.h2.Driver
@@ -72,7 +72,7 @@ jwt.expiration=86400000
 - Ajuste conforme necessidade.
 
 ## **Executando a Aplicação**
-```
+```bash
 mvn clean spring-boot:run
 ```
 - Acesse o console H2 em: `http://localhost:8080/h2-console`.
@@ -88,7 +88,7 @@ http://localhost:8080/swagger-ui/index.html
 ### Autenticação no Swagger
 1. Clique em **Authorize** (cadeado no canto superior).
 2. Insira:
-```bash
+```java
 Bearer <seu_jwt_aqui>
 ```
 3. Agora você pode testar endpoints protegidos.
