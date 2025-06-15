@@ -23,10 +23,13 @@ import com.matchinvest.rest.model.AppUser;
 import com.matchinvest.rest.repository.AppUserRepository;
 import com.matchinvest.rest.security.JwtUtil;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Auth", description = "Operações de Registro e Login")
 public class AuthController {
 
     private final AppUserRepository repo;
@@ -41,6 +44,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Cria uma conta no app")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO dto) {
     	log.info("POST /api/v1/auth/register — payload={}", dto);
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
@@ -68,6 +72,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Faz login em uma conta no app para recuperar o token de autenticação")
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody UserLoginDTO dto) {
     	log.info("POST /api/v1/auth/login — payload={}", dto);
         Optional<AppUser> optUser = repo.findByUsername(dto.getUsername());

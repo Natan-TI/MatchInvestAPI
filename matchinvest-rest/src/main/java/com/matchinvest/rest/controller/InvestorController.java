@@ -22,53 +22,62 @@ import com.matchinvest.rest.model.AppUser;
 import com.matchinvest.rest.repository.AppUserRepository;
 import com.matchinvest.rest.service.InvestorService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/investors")
+@Tag(name = "Investors", description = "Operações de CRUD para investidores")
 public class InvestorController {
-  private final InvestorService service;
-  private final AppUserRepository userRepository;
-  private static final Logger log = LoggerFactory.getLogger(InvestorController.class);
-  public InvestorController(InvestorService service, AppUserRepository userRepository) { this.service = service; this.userRepository = userRepository;}
-
-  @PostMapping
-  public ResponseEntity<InvestorResponseDTO> create(@Valid @RequestBody InvestorRequestDTO dto, Authentication authentication) {
-	  log.info("POST /api/v1/investors — payload={}", dto);
-	  String username = authentication.getName();
+	
+	private final InvestorService service;
+	private final AppUserRepository userRepository;
+	private static final Logger log = LoggerFactory.getLogger(InvestorController.class);
+	public InvestorController(InvestorService service, AppUserRepository userRepository) { this.service = service; this.userRepository = userRepository;}
+	  
+	@PostMapping
+	@Operation(summary = "Cria um novo perfil de investidor")
+	public ResponseEntity<InvestorResponseDTO> create(@Valid @RequestBody InvestorRequestDTO dto, Authentication authentication) {
+	    log.info("POST /api/v1/investors — payload={}", dto);
+	    String username = authentication.getName();
 	    AppUser user = userRepository.findByUsername(username)
 	                    .orElseThrow(/* … */);
 	    Long userId = user.getId();
 	  
-    InvestorResponseDTO created = service.create(dto, userId);
-    return ResponseEntity.created(URI.create("/api/v1/investors/" + created.getId()))
+	    InvestorResponseDTO created = service.create(dto, userId);
+	    return ResponseEntity.created(URI.create("/api/v1/investors/" + created.getId()))
                          .body(created);
-  }
+	}
+	
+	@GetMapping
+	@Operation(summary = "Lista todos os investidores")
+	public ResponseEntity<List<InvestorResponseDTO>> listAll() {
+	  log.info("GET /api/v1/investors");
+	  return ResponseEntity.ok(service.findAll());
+	}
 
-  @GetMapping
-  public ResponseEntity<List<InvestorResponseDTO>> listAll() {
-    log.info("GET /api/v1/investors");
-    return ResponseEntity.ok(service.findAll());
-  }
+	@GetMapping("/{id}")
+	@Operation(summary = "Busca investidor por ID")
+	public ResponseEntity<InvestorResponseDTO> getById(@PathVariable Long id) {
+		log.info("GET /api/v1/investors/{}", id);
+	    return ResponseEntity.ok(service.findById(id));
+	}
 
-  @GetMapping("/{id}")
-  public ResponseEntity<InvestorResponseDTO> getById(@PathVariable Long id) {
-	log.info("GET /api/v1/investors/{}", id);
-    return ResponseEntity.ok(service.findById(id));
-  }
+	@PutMapping("/{id}")
+	@Operation(summary = "Atualiza investidor por ID")
+	public ResponseEntity<InvestorResponseDTO> update(
+	    @PathVariable Long id,
+	    @Valid @RequestBody InvestorRequestDTO dto) {
+		log.info("PUT /api/v1/investors/{} — payload={}", id, dto);
+	    return ResponseEntity.ok(service.update(id, dto));
+	}
 
-  @PutMapping("/{id}")
-  public ResponseEntity<InvestorResponseDTO> update(
-      @PathVariable Long id,
-      @Valid @RequestBody InvestorRequestDTO dto) {
-	  log.info("PUT /api/v1/investors/{} — payload={}", id, dto);
-    return ResponseEntity.ok(service.update(id, dto));
-  }
-
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> delete(@PathVariable Long id) {
-	log.info("DELETE /api/v1/investors/{}", id);
-    service.delete(id);
-    return ResponseEntity.noContent().build();
-  }
+	@DeleteMapping("/{id}")
+	@Operation(summary = "Deleta investidor por ID")
+	public ResponseEntity<Void> delete(@PathVariable Long id) {
+		log.info("DELETE /api/v1/investors/{}", id);
+	    service.delete(id);
+	    return ResponseEntity.noContent().build();
+	}
 }

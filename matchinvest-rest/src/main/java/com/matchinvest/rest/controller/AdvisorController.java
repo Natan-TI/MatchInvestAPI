@@ -24,10 +24,13 @@ import com.matchinvest.rest.model.AppUser;
 import com.matchinvest.rest.repository.AppUserRepository;
 import com.matchinvest.rest.service.AdvisorService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/advisors")
+@Tag(name = "Advisors", description = "Operações de CRUD para assessores")
 public class AdvisorController {
 
 	private static final Logger log = LoggerFactory.getLogger(InvestorController.class);
@@ -40,6 +43,7 @@ public class AdvisorController {
     }
 
     @PostMapping
+    @Operation(summary = "Cria um novo perfil de assessor")
     public ResponseEntity<AdvisorResponseDTO> create(
             Authentication auth,
             @Valid @RequestBody AdvisorRequestDTO dto) {
@@ -52,6 +56,7 @@ public class AdvisorController {
     }
 
     @GetMapping
+    @Operation(summary = "Lista todos os assessores")
     public ResponseEntity<Page<AdvisorResponseDTO>> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -61,12 +66,14 @@ public class AdvisorController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Busca assessor por ID")
     public ResponseEntity<AdvisorResponseDTO> get(@PathVariable Long id) {
     	log.info("GET /api/v1/investors/{}", id);
         return ResponseEntity.ok(service.getById(id));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualiza assessor por ID")
     public ResponseEntity<AdvisorResponseDTO> update(
             @PathVariable Long id,
             @Valid @RequestBody AdvisorRequestDTO dto) {
@@ -75,6 +82,7 @@ public class AdvisorController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deleta assessor por ID")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
     	log.info("DELETE /api/v1/investors/{}", id);
         service.delete(id);
