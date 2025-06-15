@@ -41,13 +41,13 @@
 
 ## **Configuração**
 1. **Clone o repositório**:
-```bash
+```js
 git clone https://github.com/Natan-TI/MatchInvestAPI
 cd matchinvest-rest
 ```
 
 2. **Aplicação de Propriedades**: Edite `src/main/resources/application.properties` com:
-```bash
+```sh
 #H2 com criptografia em repouso
 spring.datasource.url=jdbc:h2:file:./data/matchinvest;CIPHER=AES
 spring.datasource.driverClassName=org.h2.Driver
@@ -113,7 +113,7 @@ Consulte o Swagger para detalhes de request/response.
 - **Logs**:
     - Requisições principais e erros são logados com SLF4J.
     - Exemplo em `InvestorController`:
-    ```bash
+    ```java
     private static final Logger log = LoggerFactory.getLogger(InvestorController.class);
     ```
 
